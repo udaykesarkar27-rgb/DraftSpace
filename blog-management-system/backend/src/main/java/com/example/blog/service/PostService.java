@@ -15,6 +15,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -83,6 +85,20 @@ public class PostService {
         postRepository.delete(post);
     }
 
+    // Added toggleLike method
+    @Transactional
+    public void toggleLike(Long id, String username) {
+        Post post = findPost(id);
+        User user = findUser(username);
+
+        if (post.getLikedBy().contains(user)) {
+            post.getLikedBy().remove(user); // Unlike if already liked
+        } else {
+            post.getLikedBy().add(user); // Like if not liked
+        }
+        postRepository.save(post);
+    }
+
     // ---------------------------------------------------------------- helpers
 
     private void apply(Post post, PostRequest req) {
@@ -121,9 +137,24 @@ public class PostService {
 
     private PostResponse toResponse(Post p, long commentCount, boolean includeContent) {
         String content = p.getContent();
-        return new PostResponse(p.getId(), p.getTitle(), includeContent ? content : null, excerpt(content),
+
+        // Calculate likes and check if the current user has liked it
+        int likeCount = p.getLikedBy().size();
+        boolean likedByCurrentUser = false;
+
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth != null && auth.isAuthenticated() && !auth.getName().equals("anonymousUser")) {
+            String currentUsername = auth.getName();
+            likedByCurrentUser = p.getLikedBy().stream()
+                    .anyMatch(u -> u.getUsername().equals(currentUsername));
+        }
+
+        return new PostResponse(
+                p.getId(), p.getTitle(), includeContent ? content : null, excerpt(content),
                 p.getCategory(), p.getAuthor().getId(), p.getAuthor().getUsername(),
-                p.getCreatedAt(), p.getUpdatedAt(), commentCount, readTime(content));
+                p.getCreatedAt(), p.getUpdatedAt(), commentCount, readTime(content),
+                likeCount, likedByCurrentUser
+        );
     }
 
     private int readTime(String content) {

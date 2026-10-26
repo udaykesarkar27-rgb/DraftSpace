@@ -12,6 +12,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -41,8 +42,6 @@ public class SecurityConfig {
     @Value("${app.cors.allowed-origins}")
     private String allowedOrigins;
 
-
-
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
@@ -58,10 +57,12 @@ public class SecurityConfig {
         http
                 // Disable CSRF since we are using stateless JWT authentication
                 .csrf(csrf -> csrf.disable())
-                // Configure CORS to allow requests from your React frontend
-                .cors(cors -> cors.configure(http))
+                // Configure CORS to properly use the configuration source defined below
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 // Set session management to stateless
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                // CRITICAL FIX: Add the JWT filter to process the token before username/password authentication
+                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
                 // Configure authorization rules
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**", "/api/posts/**", "/swagger-ui/**", "/v3/api-docs/**").permitAll()

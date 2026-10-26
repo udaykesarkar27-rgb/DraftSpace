@@ -18,5 +18,9 @@ public final class PostDtos {
             Long id, String title, String content, String excerpt, String category,
             Long authorId, String authorUsername,
             Instant createdAt, Instant updatedAt,
-            long commentCount, int readTimeMinutes) {}
+            long commentCount, int readTimeMinutes,
+
+            // Added fields for the Like feature
+            int likeCount,
+            boolean likedByCurrentUser) {}
 }

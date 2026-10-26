@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import ReactMarkdown from 'react-markdown';
-import { Clock, Pencil, Trash2, ArrowLeft } from 'lucide-react';
+import { Clock, Pencil, Trash2, ArrowLeft, Share2, Heart } from 'lucide-react';
 import { commentApi, postApi } from '../api/services.js';
 import { getErrorMessage } from '../api/client.js';
 import { useAuth } from '../context/AuthContext.jsx';
@@ -20,6 +20,10 @@ export default function PostView() {
   const [posting, setPosting] = useState(false);
   const [commentError, setCommentError] = useState('');
 
+  const [shareText, setShareText] = useState('Share');
+  const [isLiked, setIsLiked] = useState(false);
+  const [likeCount, setLikeCount] = useState(0);
+
   const load = useCallback(async () => {
     setLoading(true);
     setError('');
@@ -27,6 +31,9 @@ export default function PostView() {
       const [p, c] = await Promise.all([postApi.get(id), commentApi.list(id)]);
       setPost(p);
       setComments(c);
+
+      setLikeCount(p.likeCount || 0);
+      setIsLiked(p.likedByCurrentUser || false);
     } catch (e) {
       setError(e.response?.status === 404 ? 'This post does not exist or was removed.' : getErrorMessage(e));
     } finally {
@@ -77,8 +84,43 @@ export default function PostView() {
     }
   };
 
+  const handleShare = async () => {
+    try {
+      await navigator.clipboard.writeText(window.location.href);
+      setShareText('Copied!');
+      setTimeout(() => setShareText('Share'), 2000);
+    } catch (err) {
+      console.error('Failed to copy the link: ', err);
+      alert('Failed to copy link. Please copy the URL from your address bar.');
+    }
+  };
+
+  const handleLike = async () => {
+    if (!isAuthenticated) {
+      alert("Please log in to like this post.");
+      navigate('/login', { state: { from: `/posts/${id}` } });
+      return;
+    }
+
+    const previousIsLiked = isLiked;
+    const previousLikeCount = likeCount;
+
+    setIsLiked(!isLiked);
+    setLikeCount(isLiked ? likeCount - 1 : likeCount + 1);
+
+    try {
+      await postApi.toggleLike(id);
+    } catch (error) {
+      setIsLiked(previousIsLiked);
+      setLikeCount(previousLikeCount);
+      console.error("Failed to toggle like", error);
+      setError("Failed to like the post. Please try again.");
+    }
+  };
+
   if (loading) return <Spinner label="Loading post" />;
-  if (error)
+
+  if (error) {
     return (
       <div className="max-w-xl">
         <ErrorNote>{error}</ErrorNote>
@@ -87,6 +129,7 @@ export default function PostView() {
         </Link>
       </div>
     );
+  }
 
   return (
     <article className="mx-auto max-w-2xl">
@@ -125,7 +168,29 @@ export default function PostView() {
         <ReactMarkdown>{post.content}</ReactMarkdown>
       </div>
 
-      <section className="mt-14 border-t border-line pt-8" aria-labelledby="comments-heading">
+      {/* Action Buttons: Like and Share */}
+      <div className="mt-8 flex gap-4 border-t border-line pt-6">
+        <button
+          onClick={handleLike}
+          className={`flex items-center gap-2 rounded-md px-3 py-2 transition-colors ${
+            isLiked
+              ? 'text-red-500 bg-red-50 hover:bg-red-100'
+              : 'btn-quiet hover:bg-gray-100 text-ink-soft'
+          }`}
+        >
+          <Heart className={`h-4 w-4 ${isLiked ? 'fill-current' : ''}`} aria-hidden="true" />
+          {likeCount} {likeCount === 1 ? 'Like' : 'Likes'}
+        </button>
+
+        <button
+          onClick={handleShare}
+          className="btn-quiet flex items-center gap-2 rounded-md hover:bg-gray-100 px-3 py-2 transition-colors text-ink-soft"
+        >
+          <Share2 className="h-4 w-4" aria-hidden="true" /> {shareText}
+        </button>
+      </div>
+
+      <section className="mt-8 border-t border-line pt-8" aria-labelledby="comments-heading">
         <h2 id="comments-heading" className="text-xl font-bold">
           Comments ({comments.length})
         </h2>

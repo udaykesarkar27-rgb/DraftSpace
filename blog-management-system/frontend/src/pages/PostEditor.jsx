@@ -13,7 +13,7 @@ const TOOLS = [
   { label: 'Heading', icon: Heading2, before: '## ', after: '', placeholder: 'Heading', line: true },
   { label: 'Quote', icon: Quote, before: '> ', after: '', placeholder: 'Quoted text', line: true },
   { label: 'Code', icon: Code, before: '`', after: '`', placeholder: 'code' },
-  { label: 'List', icon: List, before: '\n- ', after: '', placeholder: 'List item', line: true },
+  { label: 'List', icon: List, before: '- ', after: '', placeholder: 'List item', line: true },
   { label: 'Link', icon: Link2, before: '[', after: '](https://)', placeholder: 'link text' },
 ];
 
@@ -105,8 +105,8 @@ export default function PostEditor() {
   if (!isAuthenticated) {
     return (
       <div className="mx-auto max-w-3xl text-center py-12">
-        <h2 className="text-2xl font-bold mb-2">Authentication Required</h2>
-        <p className="text-ink-soft mb-4">Please log in to create or edit blog posts.</p>
+        <h2 className="text-2xl font-bold mb-2 dark:text-white">Authentication Required</h2>
+        <p className="text-ink-soft dark:text-gray-400 mb-4">Please log in to create or edit blog posts.</p>
         <button onClick={() => navigate('/login')} className="btn-primary">
           Go to Login
         </button>
@@ -117,18 +117,29 @@ export default function PostEditor() {
   if (loading) return <Spinner />;
 
   return (
-    <form onSubmit={submit} className="mx-auto max-w-3xl" noValidate>
-      <h1 className="text-3xl font-bold">{editing ? 'Edit post' : 'New post'}</h1>
+    <form onSubmit={submit} className="mx-auto max-w-3xl text-ink dark:text-gray-100" noValidate>
+      <h1 className="text-3xl font-bold dark:text-white">{editing ? 'Edit post' : 'New post'}</h1>
 
       <div className="mt-6 space-y-5">
         <ErrorNote>{error}</ErrorNote>
 
         <Field label="Title" error={fieldErrors.title}>
-          <input className="input text-lg font-medium" maxLength={200} value={form.title} onChange={set('title')} />
+          <input
+            className="input text-lg font-medium dark:bg-gray-800 dark:border-gray-700 dark:text-white dark:focus:border-brand dark:focus:ring-brand transition-colors"
+            maxLength={200}
+            value={form.title}
+            onChange={set('title')}
+          />
         </Field>
 
         <Field label="Category" error={fieldErrors.category} hint="Pick an existing one or type a new one">
-          <input className="input max-w-xs" list="category-options" maxLength={50} value={form.category} onChange={set('category')} />
+          <input
+            className="input max-w-xs dark:bg-gray-800 dark:border-gray-700 dark:text-white dark:focus:border-brand dark:focus:ring-brand transition-colors"
+            list="category-options"
+            maxLength={50}
+            value={form.category}
+            onChange={set('category')}
+          />
           <datalist id="category-options">
             {categories.map((c) => (
               <option key={c} value={c} />
@@ -137,7 +148,7 @@ export default function PostEditor() {
         </Field>
 
         <div>
-          <div className="flex flex-wrap items-center justify-between gap-2 rounded-t-md border border-b-0 border-line bg-white px-2 py-1.5">
+          <div className="flex flex-wrap items-center justify-between gap-2 rounded-t-md border border-b-0 border-line dark:border-gray-700 bg-white dark:bg-gray-800 px-2 py-1.5 transition-colors">
             <div className="flex gap-1" role="toolbar" aria-label="Formatting">
               {TOOLS.map((t) => (
                 <button
@@ -145,7 +156,7 @@ export default function PostEditor() {
                   type="button"
                   disabled={tab !== 'write'}
                   onClick={() => applyTool(t)}
-                  className="btn-quiet disabled:opacity-40"
+                  className="btn-quiet disabled:opacity-40 dark:text-gray-300 dark:hover:bg-gray-700 dark:hover:text-white transition-colors"
                   aria-label={t.label}
                   title={t.label}
                 >
@@ -161,7 +172,11 @@ export default function PostEditor() {
                   role="tab"
                   aria-selected={tab === t}
                   onClick={() => setTab(t)}
-                  className={`rounded px-3 py-1 capitalize ${tab === t ? 'bg-ink text-white' : 'text-ink-soft hover:text-ink'}`}
+                  className={`rounded px-3 py-1 capitalize transition-colors ${
+                    tab === t
+                      ? 'bg-ink text-white dark:bg-brand dark:text-white'
+                      : 'text-ink-soft hover:text-ink dark:text-gray-400 dark:hover:text-white'
+                  }`}
                 >
                   {t}
                 </button>
@@ -177,22 +192,22 @@ export default function PostEditor() {
               rows={18}
               aria-label="Post content (Markdown)"
               placeholder="Write in Markdown. Use the toolbar for headings, quotes, lists and links."
-              className="input rounded-t-none font-serif text-base leading-relaxed"
+              className="input rounded-t-none font-serif text-base leading-relaxed dark:bg-gray-900 dark:border-gray-700 dark:text-gray-100 dark:placeholder-gray-500 dark:focus:border-brand dark:focus:ring-brand transition-colors"
             />
           ) : (
-            <div className="min-h-[24rem] rounded-b-md border border-line bg-white p-5">
+            <div className="min-h-[24rem] rounded-b-md border border-line dark:border-gray-700 bg-white dark:bg-gray-900 p-5 transition-colors">
               {form.content.trim() ? (
-                <div className="prose prose-slate max-w-none font-serif prose-headings:font-sans">
+                <div className="prose prose-slate dark:prose-invert max-w-none font-serif prose-headings:font-sans transition-colors">
                   <ReactMarkdown>{form.content}</ReactMarkdown>
                 </div>
               ) : (
-                <p className="text-sm text-ink-faint">Nothing to preview yet.</p>
+                <p className="text-sm text-ink-faint dark:text-gray-500">Nothing to preview yet.</p>
               )}
             </div>
           )}
           <div className="mt-1 flex justify-between text-xs">
-            <span className="text-danger">{fieldErrors.content}</span>
-            <span className="text-ink-faint">
+            <span className="text-danger dark:text-red-400">{fieldErrors.content}</span>
+            <span className="text-ink-faint dark:text-gray-500">
               {words} words, about {readTime} min read
             </span>
           </div>
@@ -203,7 +218,7 @@ export default function PostEditor() {
         <button className="btn-primary" disabled={saving}>
           {saving ? 'Saving' : editing ? 'Save changes' : 'Publish'}
         </button>
-        <button type="button" className="btn-ghost" onClick={() => navigate(-1)}>
+        <button type="button" className="btn-ghost dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-white" onClick={() => navigate(-1)}>
           Cancel
         </button>
       </div>

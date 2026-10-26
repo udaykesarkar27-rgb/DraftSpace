@@ -77,6 +77,15 @@ public class PostController {
         postService.delete(id, username, SecurityUtils.isAdmin(auth));
     }
 
+    // Added Like Endpoint
+    @PostMapping("/{id}/like")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @SecurityRequirement(name = OpenApiConfig.BEARER)
+    public void toggleLike(@PathVariable Long id, Authentication auth) {
+        String username = getUsernameOrThrow(auth);
+        postService.toggleLike(id, username);
+    }
+
     private String getUsernameOrThrow(Authentication auth) {
         Authentication currentAuth = auth != null ? auth : SecurityContextHolder.getContext().getAuthentication();
 

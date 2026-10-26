@@ -12,13 +12,13 @@ import NotFound from './pages/NotFound.jsx';
 
 function Layout() {
   return (
-    <div className="flex min-h-screen flex-col">
+    <div className="flex min-h-screen flex-col bg-paper text-ink dark:bg-gray-900 dark:text-gray-100 transition-colors duration-300">
       <Navbar />
       <main className="mx-auto w-full max-w-5xl flex-1 px-4 py-8 sm:px-6">
         <Outlet />
       </main>
-      <footer className="border-t border-line py-6 text-center text-sm text-ink-faint">
-        Fieldnotes - a small place for long-form writing
+      <footer className="border-t border-line dark:border-gray-800 py-6 text-center text-sm text-ink-faint dark:text-gray-500 transition-colors">
+        DraftSpace - a small place for long-form writing
       </footer>
     </div>
   );

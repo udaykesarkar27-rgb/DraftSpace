@@ -50,7 +50,7 @@ export default function MyPosts() {
   if (!isAuthenticated) {
     return (
       <Empty title="Please log in to view your posts">
-        <Link to="/login" className="font-medium text-brand hover:underline">
+        <Link to="/login" className="font-medium text-brand dark:text-brand-tint hover:underline">
           Go to Login
         </Link>
       </Empty>
@@ -58,11 +58,11 @@ export default function MyPosts() {
   }
 
   return (
-    <div>
+    <div className="text-ink dark:text-gray-100">
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h1 className="text-3xl font-bold">My posts</h1>
-          {data && <p className="mt-1 text-sm text-ink-soft">{data.totalElements} published</p>}
+          <h1 className="text-3xl font-bold dark:text-white">My posts</h1>
+          {data && <p className="mt-1 text-sm text-ink-soft dark:text-gray-400">{data.totalElements} published</p>}
         </div>
         <Link to="/dashboard/new" className="btn-primary">
           <Plus className="h-4 w-4" aria-hidden="true" /> New post
@@ -75,38 +75,38 @@ export default function MyPosts() {
         <Spinner />
       ) : data?.content.length === 0 ? (
         <Empty title="You haven't written anything yet">
-          <Link to="/dashboard/new" className="font-medium text-brand hover:underline">
+          <Link to="/dashboard/new" className="font-medium text-brand dark:text-brand-tint hover:underline">
             Write your first post
           </Link>
         </Empty>
       ) : (
-        <div className="mt-4 overflow-x-auto rounded-lg border border-line bg-white">
+        <div className="mt-4 overflow-x-auto rounded-lg border border-line dark:border-gray-700 bg-white dark:bg-gray-800 shadow-sm">
           <table className="w-full min-w-[40rem]">
-            <thead className="border-b border-line">
+            <thead className="border-b border-line dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50">
               <tr>
-                <th className="th">Title</th>
-                <th className="th">Category</th>
-                <th className="th">Published</th>
-                <th className="th">Comments</th>
-                <th className="th text-right">Actions</th>
+                <th className="th dark:text-gray-300">Title</th>
+                <th className="th dark:text-gray-300">Category</th>
+                <th className="th dark:text-gray-300">Published</th>
+                <th className="th dark:text-gray-300">Comments</th>
+                <th className="th text-right dark:text-gray-300">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-line">
+            <tbody className="divide-y divide-line dark:divide-gray-700">
               {data?.content?.map((p) => (
-                <tr key={p.id}>
-                  <td className="td max-w-xs truncate font-medium">{p.title}</td>
-                  <td className="td text-ink-soft">{p.category}</td>
-                  <td className="td text-ink-soft">{formatDate(p.createdAt)}</td>
-                  <td className="td text-ink-soft">{p.commentCount}</td>
+                <tr key={p.id} className="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
+                  <td className="td max-w-xs truncate font-medium dark:text-white">{p.title}</td>
+                  <td className="td text-ink-soft dark:text-gray-400">{p.category}</td>
+                  <td className="td text-ink-soft dark:text-gray-400">{formatDate(p.createdAt)}</td>
+                  <td className="td text-ink-soft dark:text-gray-400">{p.commentCount}</td>
                   <td className="td">
                     <div className="flex justify-end gap-1">
-                      <Link to={`/posts/${p.id}`} className="btn-quiet" aria-label={`View ${p.title}`}>
+                      <Link to={`/posts/${p.id}`} className="btn-quiet dark:text-gray-400 dark:hover:text-white dark:hover:bg-gray-700" aria-label={`View ${p.title}`}>
                         <ExternalLink className="h-4 w-4" aria-hidden="true" />
                       </Link>
-                      <Link to={`/dashboard/edit/${p.id}`} className="btn-quiet" aria-label={`Edit ${p.title}`}>
+                      <Link to={`/dashboard/edit/${p.id}`} className="btn-quiet dark:text-gray-400 dark:hover:text-white dark:hover:bg-gray-700" aria-label={`Edit ${p.title}`}>
                         <Pencil className="h-4 w-4" aria-hidden="true" />
                       </Link>
-                      <button onClick={() => remove(p)} className="btn-quiet text-danger" aria-label={`Delete ${p.title}`}>
+                      <button onClick={() => remove(p)} className="btn-quiet text-danger dark:text-red-400 dark:hover:bg-gray-700 dark:hover:text-red-300" aria-label={`Delete ${p.title}`}>
                         <Trash2 className="h-4 w-4" aria-hidden="true" />
                       </button>
                     </div>
@@ -118,7 +118,9 @@ export default function MyPosts() {
         </div>
       )}
 
-      <Pagination page={data?.page ?? 0} totalPages={data?.totalPages ?? 0} onChange={setPage} />
+      <div className="mt-6">
+        <Pagination page={data?.page ?? 0} totalPages={data?.totalPages ?? 0} onChange={setPage} />
+      </div>
     </div>
   );
 }

@@ -15,6 +15,9 @@ export const postApi = {
   create: (data) => api.post('/posts', data).then((r) => r.data),
   update: (id, data) => api.put(`/posts/${id}`, data).then((r) => r.data),
   remove: (id) => api.delete(`/posts/${id}`),
+
+  // Added toggleLike for Module 2
+  toggleLike: (id) => api.post(`/posts/${id}/like`).then((r) => r.data),
 };
 
 export const commentApi = {

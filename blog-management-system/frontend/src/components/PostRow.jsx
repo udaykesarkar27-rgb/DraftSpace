@@ -1,34 +1,53 @@
 import { Link } from 'react-router-dom';
-import { Clock, MessageSquare } from 'lucide-react';
+import { Clock, MessageSquare, Heart } from 'lucide-react';
 import { formatDate } from './ui.jsx';
 
-/** Editorial list row used on the home feed. */
+/** Editorial card used on the home feed. */
 export default function PostRow({ post, onCategory }) {
   return (
-    <article className="border-b border-line py-7 first:pt-0">
-      <button
-        type="button"
-        onClick={() => onCategory?.(post.category)}
-        className="text-sm font-medium text-brand hover:underline"
-      >
-        {post.category}
-      </button>
-      <h2 className="mt-1 text-2xl font-bold leading-snug sm:text-3xl">
-        <Link to={`/posts/${post.id}`} className="hover:text-brand">
+    <article className="flex flex-col h-full bg-white rounded-xl shadow-sm border border-gray-100 p-6 hover:shadow-lg transition-all duration-300 hover:-translate-y-1 group">
+      {/* Card Header: Category and Date */}
+      <div className="mb-4 flex items-center justify-between">
+        <button
+          type="button"
+          onClick={() => onCategory?.(post.category)}
+          className="text-xs font-bold uppercase tracking-wider text-brand hover:opacity-80 transition-opacity"
+        >
+          {post.category}
+        </button>
+        <span className="text-xs font-medium text-gray-400">
+          {formatDate(post.createdAt)}
+        </span>
+      </div>
+
+      {/* Card Body: Title and Excerpt */}
+      <h2 className="mb-3 text-xl font-bold leading-snug text-gray-900 group-hover:text-brand transition-colors">
+        <Link to={`/posts/${post.id}`} className="block">
           {post.title}
         </Link>
       </h2>
-      <p className="mt-2 max-w-2xl font-serif text-[1.05rem] leading-relaxed text-ink-soft">{post.excerpt}</p>
-      <div className="mt-3 flex flex-wrap items-center gap-x-5 gap-y-1 text-sm text-ink-faint">
-        <span>
-          <span className="text-ink-soft">{post.authorUsername}</span> on {formatDate(post.createdAt)}
+
+      <p className="mb-6 font-serif text-[1rem] leading-relaxed text-gray-600 flex-grow">
+        {post.excerpt}
+      </p>
+
+      {/* Card Footer: Author and Stats */}
+      <div className="mt-auto pt-4 border-t border-gray-50 flex flex-wrap items-center justify-between text-sm text-gray-500">
+        <span className="font-medium text-gray-800">
+          {post.authorUsername}
         </span>
-        <span className="inline-flex items-center gap-1">
-          <Clock className="h-3.5 w-3.5" aria-hidden="true" /> {post.readTimeMinutes} min read
-        </span>
-        <span className="inline-flex items-center gap-1">
-          <MessageSquare className="h-3.5 w-3.5" aria-hidden="true" /> {post.commentCount}
-        </span>
+
+        <div className="flex items-center gap-4">
+          <span className="flex items-center gap-1.5" title={`${post.readTimeMinutes} min read`}>
+            <Clock className="h-4 w-4" aria-hidden="true" /> {post.readTimeMinutes}
+          </span>
+          <span className="flex items-center gap-1.5" title={`${post.commentCount} comments`}>
+            <MessageSquare className="h-4 w-4" aria-hidden="true" /> {post.commentCount}
+          </span>
+          <span className="flex items-center gap-1.5" title={`${post.likeCount || 0} likes`}>
+            <Heart className="h-4 w-4" aria-hidden="true" /> {post.likeCount || 0}
+          </span>
+        </div>
       </div>
     </article>
   );
