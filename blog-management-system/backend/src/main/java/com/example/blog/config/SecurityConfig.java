@@ -78,6 +78,12 @@ public class SecurityConfig {
         cfg.setAllowedOrigins(Arrays.stream(allowedOrigins.split(",")).map(String::trim).toList());
         cfg.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         cfg.setAllowedHeaders(List.of("Authorization", "Content-Type", "Accept"));
+
+        // CRITICAL FIX: Allow credentials so the frontend login request doesn't get blocked
+        cfg.setAllowCredentials(true);
+        // CRITICAL FIX: Expose Authorization header so the frontend can read the JWT token
+        cfg.setExposedHeaders(List.of("Authorization"));
+
         cfg.setMaxAge(3600L);
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", cfg);
